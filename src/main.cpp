@@ -3,6 +3,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+#include "led.h"
+
 #define OLED_ADDR 0x3C
 Adafruit_SSD1306 lcd(128, 64, &Wire, -1);
 
@@ -10,29 +12,25 @@ int redButton = 27;
 int blueButton = 26;
 int whiteButton = 25;
 
-int greenLed = 14;
-int redLed = 12;
-
 bool lastAnyPressed = false;
 
 void test()
 {
-  bool anyPressed =
-      (digitalRead(redButton) == LOW) ||
-      (digitalRead(blueButton) == LOW) ||
-      (digitalRead(whiteButton) == LOW);
+  bool redState = (digitalRead(redButton) == LOW);
+  bool blueState = (digitalRead(blueButton) == LOW);
+  bool whiteState = (digitalRead(whiteButton) == LOW);
 
-  if (anyPressed && !lastAnyPressed)
-  {
-    digitalWrite(redLed, HIGH); // pressed → ON
+  if (redState) {
+    falseLed();
+    redState = !redState;
+    delay(150);
   }
 
-  if (!anyPressed && lastAnyPressed)
-  {
-    digitalWrite(redLed, LOW); // released → OFF
+  if (blueState) {
+    trueLed();
+    blueState = !blueState;
+    delay(150);
   }
-
-  lastAnyPressed = anyPressed;
 }
 
 void setup()
@@ -42,9 +40,7 @@ void setup()
   pinMode(blueButton, INPUT_PULLUP);
   pinMode(whiteButton, INPUT_PULLUP);
 
-  // led
-  pinMode(greenLed, OUTPUT);
-  pinMode(redLed, OUTPUT);
+  initLed();
 
   lcd.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
   lcd.clearDisplay();
