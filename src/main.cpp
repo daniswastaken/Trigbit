@@ -4,6 +4,7 @@
 #include <Adafruit_SSD1306.h>
 
 #include "led.h"
+#include "trig.h"
 
 #define OLED_ADDR 0x3C
 Adafruit_SSD1306 lcd(128, 64, &Wire, -1);
@@ -20,17 +21,46 @@ void test()
   bool blueState = (digitalRead(blueButton) == LOW);
   bool whiteState = (digitalRead(whiteButton) == LOW);
 
-  if (redState) {
-    falseLed();
-    redState = !redState;
-    delay(150);
+  static bool lastRed = HIGH;
+
+  bool redNow = digitalRead(redButton);
+
+  if (lastRed == HIGH && redNow == LOW)
+  {
+    trigPickNext();
+
+    lcd.clearDisplay();
+    lcd.setCursor(0, 0);
+    lcd.setTextSize(2);
+    lcd.setTextColor(WHITE);
+    lcd.print(trigQuestion());
+    lcd.display();
   }
 
-  if (blueState) {
+  lastRed = redNow;
+
+  /*
+  if (redState)
+  {
+    trigPickNext();
+    lcd.clearDisplay();
+    lcd.setCursor(0,0);
+    lcd.setTextColor(WHITE);
+    lcd.setTextSize(2);
+    lcd.print(trigQuestion());
+    lcd.display();
+    delay(150);
+
+    redState = !redState;
+  }
+
+  if (blueState)
+  {
     trueLed();
     blueState = !blueState;
     delay(150);
   }
+    */
 }
 
 void setup()
@@ -45,6 +75,8 @@ void setup()
   lcd.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
   lcd.clearDisplay();
   lcd.display();
+
+  trigInit();
 }
 
 void loop()
